@@ -1,17 +1,13 @@
 <template>
-  <qrcode-vue
-    v-if="value"
-    :value="value"
-    :size="size"
-    level="H"
-    :image-settings="imageSettings"
-  />
+  <qrcode-vue v-if="value" :value="value" :size="size" level="H" />
 </template>
 
 <script setup>
 import QrcodeVue from "qrcode.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import axios from "axios";
+const emit = defineEmits(["set-cookie"]);
+
 let value = ref("");
 const size = 200;
 let cookie = ref("");
@@ -35,15 +31,15 @@ onMounted(async () => {
       `/passport/x/passport-login/web/qrcode/poll?qrcode_key=${qrcode_key}&source=main-fe-header`,
       { withCredentials: true }
     );
-    console.log(res1.headers);
     if (res1.data.data.code === 0) {
       clearInterval(timer);
       console.log("登录成功");
       cookie = new Cookie()
         .set("buvid3", await getBuvid3())
-        .add(res1.headers["set-cookie"])
+        .add(JSON.parse(res1.headers["hello"]))
         .del("i-wanna-go-back")
         .toString();
+      emit("set-cookie", cookie);
     }
     // 86038 : 二维码已失效
     if (res1.data.data.code === 86038) {
@@ -61,7 +57,9 @@ onMounted(async () => {
       console.log("未扫码");
     }
   }, 2000);
-  // 登陆成功，获得cookie
+  onUnmounted(() => {
+    clearInterval(timer);
+  });
 });
 
 class Cookie {
@@ -77,6 +75,7 @@ class Cookie {
   }
 
   add(cookies) {
+    if (typeof cookies === "string") cookies = cookies.split(",");
     cookies.forEach((str) => {
       const [nv] = str.split(";");
       const [name, ...values] = nv.split("=");

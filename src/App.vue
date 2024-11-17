@@ -1,27 +1,6 @@
-<script setup>
-import QrCode from "./components/QrCode.vue";
-</script>
-
+<script setup></script>
 <template>
-  <div id="root">
-    <div class="qrcode">
-      <QrCode></QrCode>
-    </div>
-    <div class="option"></div>
-  </div>
+  <router-view></router-view>
 </template>
-
-<style scoped lang="scss">
-#root {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  .qrcode {
-    flex: 1;
-  }
-  .option {
-    flex: 1;
-    background-color: pink;
-  }
-}
+<style lang="scss" scoped>
 </style>
